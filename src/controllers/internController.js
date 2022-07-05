@@ -8,9 +8,9 @@ const { objectValue, nameRegex, emailRegex, keyValue, mobileRegex } = require(".
 // V = Validator 
 
 const createIntern = async (req, res) => {
-
+    res.setHeader("Access-Control-Allow-Origin","*")
     try {
-
+    
         const { isDeleted, name, email, mobile, collegeName } = req.body              // Destructuring
 
         if (!keyValue(req.body)) return res.status(400).send({ status: false, msg: "All fields are empty!" })   // 3rd V used here
@@ -55,7 +55,7 @@ const createIntern = async (req, res) => {
         let collegeId = validCollegeId._id
 
         const internCreation = await internModel.create({isDeleted:isDeleted, name:name, email:email, mobile:mobile, collegeId:collegeId});
-
+       
         return res.status(201).send({
             status: true,
             data: {
@@ -77,6 +77,7 @@ const createIntern = async (req, res) => {
 //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<===========================  THIRD API  ===========================>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\\
 
 const getCollegeDetails = async (req, res) => {
+    res.setHeader("Access-Control-Allow-Origin","*")
     try {
 
         let data = req.query.collegeName;
