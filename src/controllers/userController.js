@@ -1,55 +1,86 @@
 const userModel = require("../models/userModel");
+const jwt = require('jsonwebtoken')
+const { isValid, isValidBody, isValidPassword, isValidName, isValidEmail } = require("../validations/validator")
+
 /**************************************************Create User API**************************************************/
 const createUser = async function (req, res) {
     try {
+        let data = req.body
+        const { title, name, phone, email, password } = data
 
-        const data = req.body
 
-        if (!validator.isValidBody(data)) return res.status(400).send({ status: false, message: 'Please Enter The User Details' })
+        if (!isValid(data)) return res.status(400).send({ status: false, message: 'Please Enter The  User Details' })
+        if (!isValidBody(data)) return res.status(400).send({ status: false, message: 'Please Enter The Valid User Details' })
 
-        if (!validator.isValid(data.title)) return res.status(400).send({ status: false, message: 'Title Is Required' })
 
-        if (["Mr", "Mrs", "Miss" ].indexOf(data.title) == -1) {
-            return res.status(400).send({ status: false, data: "Enter a valid Title (e.g- Mr or Mrs or Miss)", });
-        }
+        if (!isValid(title))
+            return res.status(400).send({ status: false, message: 'Title Is Required' })
 
-        if (!validator.isValid(data.name)) return res.status(400).send({ status: false, message: 'Name Is Required' })
+        if (["Mr", "Mrs", "Miss"].indexOf(title) == -1) { return res.status(400).send({ status: false, data: "Enter a valid Title (e.g- Mr or Mrs or Miss)", }); }
 
-        if (!data.name.match(/^[a-zA-Z. ]{2,30}$/)) return res.status(400).send({ status: false, msg: "Please Enter A Valid User Name" })
+        if (!isValid(name)) return res.status(400).send({ status: false, message: 'Name Is Required' })
+        if (!isValidName(name)) return res.status(400).send({ status: false, msg: "Please Enter A Valid User Name" })
 
-        if (!validator.isValid(data.phone)) return res.status(400).send({ status: false, message: 'Phone Is Required' })
-
-        if (!(/^(\+\d{1,3}[- ]?)?\d{10}$/).test(data.phone)) {
-        return res.status(400).send({ status: false, msg: `${data.phone} is Not a Valid Mobile Number ` })
-        }
-
-        const checkPhone = await userModel.findOne({ phone: data.phone });
+        if (!isValid(phone)) return res.status(400).send({ status: false, message: 'Phone Is Required' })
+        if (!(/^(\+\d{1,3}[- ]?)?\d{10}$/).test(phone)) { return res.status(400).send({ status: false, msg: `${phone} is Not a Valid Mobile Number ` }) }
+        const checkPhone = await userModel.findOne({ phone: phone });
 
         if (checkPhone) return res.status(400).send({ status: false, message: `Phone Is Already Registered` })
 
-        if (!validator.isValid(data.email)) return res.status(400).send({ status: false, message: 'Email Is Required' })
+        if (!isValid(email)) return res.status(400).send({ status: false, message: 'Email Is Required' })
+        if (!isValidEmail(email)) { return res.status(400).send({ status: false, message: 'Email should be Valid Email Address' }) }
 
-        if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(data.email)) {
-        return res.status(400).send({ status: false, message: 'Email should be Valid Email Address' })
-        }
-
-        const checkEmail = await userModel.findOne({ email: data.email });
-
+        const checkEmail = await userModel.findOne({ email: email });
         if (checkEmail) return res.status(400).send({ status: false, message: `Email Address is Already Registered` })
+
+        if (!isValid(password)) return res.status(400).send({ status: false, message: 'Password is Required' })
+        if (!isValidPassword(password)) { return res.status(400).send({ status: false, message: "Password should have length in range 8 to 15" }) }
+
+        const newUser = await userModel.create(data);
+        res.status(201).send({ status: true, message: 'User created successfully!!!', data: newUser });
+
+    } catch (err) {
+
+        res.status(500).send({ status: false, message: err.message })
+    }
+}
+/**************************************************User Login API**************************************************/
+
+
+const loginUser = async function (req, res) {
+    try {
+
+        let data = req.body
+
+        if (!validator.isValidBody(data)) return res.status(400).send({ status: false, message: "Please Provide Login Details" })
+
+        if (!validator.isValid(data.email)) return res.status(400).send({ status: false, message: 'Email is Required' })
 
         if (!validator.isValid(data.password)) return res.status(400).send({ status: false, message: 'Password is Required' })
 
-        if (!(data.password.trim().length >= 8) || !(data.password.trim().length <= 15)) {
-        return res.status(400).send({ status: false, message: "Password should have length in range 8 to 15" })
+        if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(data.email)) {
+            return res.status(400).send({ status: false, message: 'Email Should Be Valid Email Address' })
         }
 
-        const newUser = await userModel.create(data);
+        if (!(data.password.trim().length >= 8) || !(data.password.trim().length <= 15)) {
+            return res.status(400).send({ status: false, message: "Password should have length in range 8 to 15" })
+        }
 
-        res.status(201).send({ status: true, message: 'User created successfully!!!', data: newUser });
+        const user = await userModel.findOne({ email: data.email, password: data.password })
 
-     } catch (err) {
+        if (!user) return res.status(401).send({ status: false, message: 'Invalid Login Credentials' });
 
-      res.status(500).send({ status: false, message: err.message })
+        const token = await jwt.sign({
+            userId: user._id,
+            iat: Math.floor(Date.now() / 1000),
+            exp: Math.floor(Date.now() / 1000) * 24 * 60 * 60,
+        }, 'DFGHJK34567890--85643ytfhgjkl')
+
+        res.status(200).send({ status: true, message: "Login Sucsessful", data: token });
+
+    } catch (err) {
+        res.status(500).send({ status: false, msg: err.message })
     }
 }
-module.exports = { createUser }
+
+module.exports = { createUser, loginUser }
