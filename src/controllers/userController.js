@@ -1,6 +1,6 @@
 const userModel = require("../models/userModel");
 const jwt = require('jsonwebtoken')
-const { isValid, isValidBody, isValidPassword, isValidName, isValidEmail } = require("../validations/validator")
+const { isValid, isValidBody, isValidPassword, isValidName, isValidEmail,address } = require("../validations/validator")
 
 /**************************************************Create User API**************************************************/
 const createUser = async function (req, res) {
@@ -10,9 +10,7 @@ const createUser = async function (req, res) {
 
 
         if (!isValid(data)) return res.status(400).send({ status: false, message: 'Please Enter The  User Details' })
-        if (!isValidBody(data)) return res.status(400).send({ status: false, message: 'Please Enter The Valid User Details' })
-
-
+       
         if (!isValid(title))
             return res.status(400).send({ status: false, message: 'Title Is Required' })
 
@@ -35,6 +33,13 @@ const createUser = async function (req, res) {
 
         if (!isValid(password)) return res.status(400).send({ status: false, message: 'Password is Required' })
         if (!isValidPassword(password)) { return res.status(400).send({ status: false, message: "Password should have length in range 8 to 15" }) }
+        
+        if(!isValidBody(data.address.street))
+        return res.status(400).send({ status: false, message: 'Address Of street is Invalid' })
+        if(!isValidBody(data.address.city))
+        return res.status(400).send({ status: false, message: 'Address Of city is Invalid' })
+        if(!(/^[1-9]{1}[0-9]{5}$/).test(data.address.pincode)) 
+        return res.status(400).send({ status: false, message: 'Address Of pincode is Invalid' })
 
         const newUser = await userModel.create(data);
         res.status(201).send({ status: true, message: 'User created successfully!!!', data: newUser });
@@ -51,24 +56,22 @@ const loginUser = async function (req, res) {
     try {
 
         let data = req.body
+    const  {password, email} = data
 
-        if (!validator.isValidBody(data)) return res.status(400).send({ status: false, message: "Please Provide Login Details" })
+        if (!isValid(data)) return res.status(400).send({ status: false, message: "Please Provide Login Details" })
 
-        if (!validator.isValid(data.email)) return res.status(400).send({ status: false, message: 'Email is Required' })
-
-        if (!validator.isValid(data.password)) return res.status(400).send({ status: false, message: 'Password is Required' })
-
-        if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(data.email)) {
+        if (!isValid(email)) return res.status(400).send({ status: false, message: 'Email is Required' })
+          if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
             return res.status(400).send({ status: false, message: 'Email Should Be Valid Email Address' })
         }
 
-        if (!(data.password.trim().length >= 8) || !(data.password.trim().length <= 15)) {
+        if (!isValid(password)) return res.status(400).send({ status: false, message: 'Password is Required' })
+        if (!isValidPassword(password)) {
             return res.status(400).send({ status: false, message: "Password should have length in range 8 to 15" })
         }
-
-        const user = await userModel.findOne({ email: data.email, password: data.password })
-
+        const user = await userModel.findOne({ email: email, password: password })
         if (!user) return res.status(401).send({ status: false, message: 'Invalid Login Credentials' });
+
 
         const token = await jwt.sign({
             userId: user._id,

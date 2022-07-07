@@ -65,5 +65,45 @@ const createBook = async function(req, res){
    }
    
 }
+const getAllBooks = async function(req, res){
+    
+    try {
 
-module.exports = {createBook}
+        let data = req.query
+        data.isDeleted = false
+        
+        if(data.userId){
+        if (!isValidObjectId(data.userId)) return res.status(400).send({ status: false, message: `Invalid userId.` })
+        let checkUser = await userModel.findById(data.userId)
+        if (!checkUser) return res.status(404).send({ status: false, message: "UserId Not Found" })
+        }
+
+        if (!isValidBody(data.category))return res.status(400).send({ status: false, message: "category Not Valid" })
+        
+        if (!isValidBody(data.subcategory))return res.status(400).send({ status: false, message: "subcategory Not Valid" })
+        if(data.subcategory){
+        let subCategory=data.subcategory.split(',').map((x)=>(x.trim()))
+        data.subcategory=subCategory
+        }
+    
+        const bookList= await bookModel.find(data)
+        .select({ subcategory: 0, ISBN: 0, isDeleted: 0, updatedAt: 0, createdAt: 0, __v: 0 }).sort({ title: 1 });
+        
+
+        if (!bookList.length) return res.status(404).send({ status: false, message: "Book Not Found" })
+        
+        res.status(200).send({ status: true, message: "Book List", data: bookList })
+
+    } catch (err) {
+        res.status(500).send({ status: false, error: err.message })
+    }
+}
+const getBookById = async function(req, res){
+
+}
+
+
+
+
+
+module.exports = {createBook, getAllBooks}
