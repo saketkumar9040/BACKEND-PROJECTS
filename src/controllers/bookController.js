@@ -98,11 +98,6 @@ const getAllBooks = async function(req, res){
         res.status(500).send({ status: false, error: err.message })
     }
 }
-const getBookById = async function(req, res){
-
-}
-
-
 
 
 
