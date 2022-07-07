@@ -1,44 +1,44 @@
 const mongoose = require('mongoose')
-const  ObjectId = mongoose.Schema.Types.ObjectId
+const ObjectId = mongoose.Schema.Types.ObjectId
 const bookSchema = new mongoose.Schema({
 
     title: {
         type: String,
         required: 'Book Title Required',
         unique: true,
-        trim:true
+        trim: true
     },
     excerpt: {
         type: String,
         required: 'Excerpt is Required',
-        trim:true
+        trim: true
     },
     userId: {
-        type:ObjectId,
+        type: ObjectId,
         required: 'userId is Required',
         ref: 'User',
-        trim:true
+        trim: true
     },
     ISBN: {
         type: String,
         required: 'ISBN is Required',
         unique: true,
-        trim:true
+        trim: true
     },
     category: {
         type: String,
         required: 'Category is Required',
-        trim:true
+        trim: true
     },
     subcategory: {
         type: [String],
         required: 'SubCategory is Required',
-        trim:true
+        trim: true
     },
     reviews: {
         type: Number,
         default: 0,
-        trim:true
+        trim: true
     },
     isDeleted: {
         type: Boolean,
@@ -46,8 +46,8 @@ const bookSchema = new mongoose.Schema({
     },
     deletedAt: Date,
     releasedAt: {
-        type:Date,
-        required:'releasedAt is Required'
+        type: Date,
+        required: 'releasedAt is Required'
     }
 
 }, { timestamps: true })

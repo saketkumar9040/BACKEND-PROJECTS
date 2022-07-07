@@ -1,6 +1,6 @@
 const userModel = require("../models/userModel");
 const jwt = require('jsonwebtoken')
-const { isValid, isValidBody, isValidPassword, isValidName, isValidEmail,address } = require("../validations/validator")
+const { isValid, isValidBody, isValidPassword, isValidName, isValidEmail, address } = require("../validations/validator")
 
 /**************************************************Create User API**************************************************/
 const createUser = async function (req, res) {
@@ -10,7 +10,7 @@ const createUser = async function (req, res) {
 
 
         if (!isValid(data)) return res.status(400).send({ status: false, message: 'Please Enter The  User Details' })
-       
+
         if (!isValid(title))
             return res.status(400).send({ status: false, message: 'Title Is Required' })
 
@@ -33,13 +33,13 @@ const createUser = async function (req, res) {
 
         if (!isValid(password)) return res.status(400).send({ status: false, message: 'Password is Required' })
         if (!isValidPassword(password)) { return res.status(400).send({ status: false, message: "Password should have length in range 8 to 15" }) }
-        
-        if(!isValidBody(data.address.street))
-        return res.status(400).send({ status: false, message: 'Address Of street is Invalid' })
-        if(!isValidBody(data.address.city))
-        return res.status(400).send({ status: false, message: 'Address Of city is Invalid' })
-        if(!(/^[1-9]{1}[0-9]{5}$/).test(data.address.pincode)) 
-        return res.status(400).send({ status: false, message: 'Address Of pincode is Invalid' })
+
+        if (!isValidBody(data.address.street))
+            return res.status(400).send({ status: false, message: 'Address Of street is Invalid' })
+        if (!isValidBody(data.address.city))
+            return res.status(400).send({ status: false, message: 'Address Of city is Invalid' })
+        if (!(/^[1-9]{1}[0-9]{5}$/).test(data.address.pincode))
+            return res.status(400).send({ status: false, message: 'Address Of pincode is Invalid' })
 
         const newUser = await userModel.create(data);
         res.status(201).send({ status: true, message: 'User created successfully!!!', data: newUser });
@@ -56,12 +56,12 @@ const loginUser = async function (req, res) {
     try {
 
         let data = req.body
-    const  {password, email} = data
+        const { password, email } = data
 
         if (!isValid(data)) return res.status(400).send({ status: false, message: "Please Provide Login Details" })
 
         if (!isValid(email)) return res.status(400).send({ status: false, message: 'Email is Required' })
-          if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
+        if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
             return res.status(400).send({ status: false, message: 'Email Should Be Valid Email Address' })
         }
 
