@@ -33,9 +33,7 @@ const isValidISBN = (isbn) => {
         return true
 }
 
-const isValidReqBody = function (value) {
-    return Object.keys(value).length > 0
-}
+
 
 const isValidReview = (review) => {
     if (/^[0-5]{1}$/.test(isbn))
@@ -47,4 +45,4 @@ const isValidDate = (date) => {
 }
 
 
-module.exports = { isValid, isValidBody, isValidObjectId, isValidTitle, isValidPassword, isValidName, isValidEmail, isValidISBN, isValidReview, isValidDate, isValidReqBody }
+module.exports = { isValid, isValidBody, isValidObjectId, isValidTitle, isValidPassword, isValidName, isValidEmail, isValidISBN, isValidReview, isValidDate }

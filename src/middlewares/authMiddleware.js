@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const bookModel = require("../models/bookModel")
+const userModel = require("../models/userModel")
 const { isValidObjectId } = require("../validations/validator")
 
 
@@ -30,38 +31,52 @@ const authenticate = async function (req, res, next) {
 
 const authorise = async function (req, res, next) {
     try {
-        let bookId = req.params.bookId
 
-        if (!isValidObjectId(bookId)) {
-            return res.status(400).send({ status: false, msg: `no such as an _id:${bookId} found` })
-        }
-        let findAuthorId = await bookModel.findById(bookId)
-        let userId = findAuthorId.userId
-        let token = (req.headers["x-api-key"]);
+        let token = req.headers["x-api-key"]
 
-        if (!token) {
-            return res.status(403).send({ status: false, message: "Missing authentication token in request" });
-        }
-        let decodedToken = jwt.verify(token, "DFGHJK34567890--85643ytfhgjkl", function (err, decoded) {
+        if (!token) return res.status(400).send({ status: false, msg: "No Token Found" })
+
+        let decodedToken = jwt.verify(token, "DFGHJK34567890--85643ytfhgjkl",function (err, decoded) {
             if (err) {
                 console.log(err.message)
             } else return decoded
-        });
-        console.log(decodedToken)
+        })
 
+        if (!decodedToken) return res.status(401).send({ status: false, msg: "invalid token" })
 
-        if (!decodedToken) {
-            return res.status(400).send({ status: false, msg: "Invalid authentication token in request" });
+        let usersId = decodedToken.userId
+        let bodyData = req.body.userId
+        let booksId = req.params.bookId
+
+        if (bodyData) {
+            if (!isValidObjectId(bodyData)) return res.status(400).send({ status: false, message: "The userId is Invalid" })
+            let checkUser = await userModel.findById(bodyData)
+            if (!checkUser) return res.status(400).send({ status: false, message: "UserId Not Found" })
+            if (usersId != bodyData) {
+                return res.status(403).send
+                    ({ status: false, message: "UnAuthorized Access!!" })
+            }
         }
-        req["userId"] = decodedToken.userId;
-        let tokenauthorId = decodedToken.userId
-        if (tokenauthorId != userId) return res.status(403).send({ Status: false, msg: "You Can't Access It" })
-        next();
-    }
 
-    catch (error) {
-        console.error(`Error! ${error.message}`)
-        res.status(500).send({ status: false, message: error.message });
+
+
+        if (booksId) {
+            if (!isValidObjectId(booksId)) return res.status(400).send({ status: false, message: "The BookId is Invalid." })
+            let checkBookData = await bookModel.findOne({ _id: booksId, isDeleted: false })
+            if (!checkBookData) return res.status(400).send({ status: false, message: "BookId Not Found" })
+            let checkBook = await bookModel.findOne({ _id: booksId, userId: usersId })
+            if (!checkBook) {
+                return res.status(403).send
+                    ({ status: false, message: "UnAuthorized Access!!" })
+            }
+        }
+
+        next()
+
+    } catch (err) {
+        res.status(500).send({ status: false, Error: err.message })
     }
 }
+
+
 module.exports = { authenticate, authorise }
