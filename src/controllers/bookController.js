@@ -168,21 +168,21 @@ const updateBook = async function (req, res) {
     }
 }
 const deleteBookById = async function (req, res) {
-    try{
-    let bookId = req.params.bookId 
-    if(!isValid(bookId)) return res.status(400).send({ status: false, message: 'please Enter The Book Id ' });
-    if (!isValidObjectId(bookId)) return res.status(400).send({ status: false, message: `invalid book Id` })
-  
-    let deletedBook= await bookModel.findOneAndUpdate({$and:[{_id: bookId},{isDeleted:false}]}, {isDeleted: true})
-    console.log(deletedBook)
-    res.status(200).send({status: true, message:"book Deleted Successfully"})
-    if(!deletedBook)return res.status(404).send({ status: false, message: `no Such Book In The Database` })
+    try {
+        let bookId = req.params.bookId
+        if (!isValid(bookId)) return res.status(400).send({ status: false, message: 'please Enter The Book Id ' });
+        if (!isValidObjectId(bookId)) return res.status(400).send({ status: false, message: `invalid book Id` })
+
+        let deletedBook = await bookModel.findOneAndUpdate({ $and: [{ _id: bookId }, { isDeleted: false }] }, { isDeleted: true })
+        console.log(deletedBook)
+        res.status(200).send({ status: true, message: "book Deleted Successfully" })
+        if (!deletedBook) return res.status(404).send({ status: false, message: `no Such Book In The Database` })
     } catch (err) {
-    res.status(500).send({ status: false, error: err.message })
+        res.status(500).send({ status: false, error: err.message })
     }
 }
 
 
 
 
-module.exports = { createBook, getAllBooks, getBookById, updateBook,  deleteBookById}
+module.exports = { createBook, getAllBooks, getBookById, updateBook, deleteBookById }
