@@ -6,10 +6,11 @@ const { isValid, isValidBody, isValidPassword, isValidName, isValidEmail, addres
 const createUser = async function (req, res) {
     try {
         let data = req.body
+        if(!Object.keys(data).length)return res.status(400).send({ status: false, message: 'Please Enter The  User Details' })
         const { title, name, phone, email, password } = data
 
 
-        if (!isValid(data)) return res.status(400).send({ status: false, message: 'Please Enter The  User Details' })
+        //if (!isValid(data)) return res.status(400).send({ status: false, message: 'Please Enter The  User Details' })
 
         if (!isValid(title))
             return res.status(400).send({ status: false, message: 'Title Is Required' })
