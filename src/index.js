@@ -12,9 +12,9 @@ mongoose.connect('mongodb+srv://sahilkushwaha:aasahil@cluster0.jluapfr.mongodb.n
     .catch((err) => console.log(err.message))
 
 app.use('/', route)
-// app.all('/**', (req, res) => {
-//     res.status(404).send({ status: false, message: "Page Not Found!" })
-// })
+app.all('/**', (req, res) => {
+    res.status(404).send({ status: false, message: "Either Page Not Found! or You are missing some of the ParaMeters" })
+ })
 app.listen(process.env.PORT || 3000, () => {
     console.log("Express app running on port" + (process.env.PORT || 3000))
 }

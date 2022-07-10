@@ -72,9 +72,9 @@ const getAllBooks = async function (req, res) {
 
     try {
 
-        let  = req.query
+        let  data = req.query
         data.isDeleted = false
-        if(data.userId && data.userId!==null){
+        if("userId" in data){
         //if(!Object.keys(data.userId).length)  return res.status(400).send({ status: false, message: `User key should be persent` })
       //  if(!isValid(data.userId)) {return res.status(400).send({ status: false, message: `UserId Value Should Not Be Blank` })}
         if (!isValidObjectId(data.userId)) return res.status(400).send({ status: false, message: `Invalid userId.` })
@@ -189,6 +189,7 @@ const updateBook = async function (req, res) {
 const deleteBookById = async function (req, res) {
     try {
         let bookId = req.params.bookId
+        if(!bookId) return res.status(400).send({status:false,Msg:"no id given"})
         if (!isValid(bookId)) return res.status(400).send({ status: false, message: 'please Enter The Book Id ' });
         if (!isValidObjectId(bookId)) return res.status(400).send({ status: false, message: `invalid book Id` })
 
