@@ -1,4 +1,4 @@
-const express = require('express')
+const express = require ('express')
 const mongoose = require('mongoose')
 const bodyParser = require('body-parser')
 const route = require('./routes/route')
@@ -12,7 +12,9 @@ mongoose.connect('mongodb+srv://sahilkushwaha:aasahil@cluster0.jluapfr.mongodb.n
     .catch((err) => console.log(err.message))
 
 app.use('/', route)
-
+// app.all('/**', (req, res) => {
+//     res.status(404).send({ status: false, message: "Page Not Found!" })
+// })
 app.listen(process.env.PORT || 3000, () => {
     console.log("Express app running on port" + (process.env.PORT || 3000))
 }

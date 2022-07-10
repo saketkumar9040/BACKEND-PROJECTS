@@ -44,17 +44,22 @@ const createReview = async function(req,res){
 
         //---------------------------[ Checking BookId in DB (Valid or Not)]---------------------------
 
+        const checkBookId = await bookModel.findOne({_id : bookId, isDeleted : false})
+        if(!checkBookId) 
+        return res.status(404).send({status : false, message : 'No such book/ Invalid bookId'})
        
 
         //---------------------------[ Update review number in book]---------------------------
 
+        let value = checkBookId.reviews +1
+        await bookModel.findOneAndUpdate(
+            {_id : checkBookId._id},
+            {$set :{reviews : value}}
+        )
        
-        const checkBookId = await bookModel.findOne({_id : bookId, isDeleted : false})
-        if(!checkBookId) 
-        return res.status(404).send({status : false, message : 'No such book/ Invalid bookId'})
 
         //-----------------[Review Document Creation]-----------------
-        let value = checkBookId.reviews +1
+
         const reviewData = await reviewModel.create({bookId : bookId, ...data})
         res.status(201).send({status : true, message : 'Success', data :{_id:reviewData._id,bookId:reviewData.bookId,reviewedBy:reviewData.reviewedBy,reviewedAt:reviewData.reviewedAt,rating:reviewData.rating,review:reviewData.review}})
     }
@@ -122,6 +127,10 @@ const updateReview = async function (req, res){
     }
     }
 
+
+
+
+
     const deleteReviewById= async function (req,res){
         try{
     
@@ -133,23 +142,25 @@ const updateReview = async function (req, res){
           if(!reviewId)return res.status(400).send({status:false,message:"no ReviewId Entered In Params"})
           if(!isValidObjectId(reviewId))return res.status(400).send({status:false,message:" ReviewId Entered Is Not In Correct Format"})
     
-          let checkReviewId=await reviewModel.findById(reviewId)
-          if(!checkReviewId)return res.status(404).send({status:false,message:"no Such ReviewId Exists"})
+          let checkReviewId=await reviewModel.findOne({_id:reviewId,isDeleted:false})
+          if(!checkReviewId)return res.status(404).send({status:false,message:"no Such Review Exists"})
     
           if(!bookId)return res.status(400).send({status:false,message:"no bookId Entered In Params"})
           if(!isValidObjectId(bookId))return res.status(400).send({status:false,message:" bookId Entered Is Not In Correct Format"})
     
           let checkBookId=await bookModel.findOne({$and:[{_id:bookId,isDeleted:false}]})
           if(!checkBookId)return res.status(404).send({status:false,message:"no Such Book Id Exists"})
-    
-          let deleteReview=await reviewModel.findOneAndUpdate({$and:[{_id:reviewId},{isDeleted:false}]},{isDeleted:true})
-    
-          let updateBookReview= await bookModel.findOneAndUpdate({_id:bookId},{reviews:reviews-1})
+
+          if(checkReviewId.bookId != bookId) return res.status(400).send({status : false, message : 'No such review to the given book'})
+          if(checkBookId.reviews<=0) return res.status(400).send({status : false, message : "This book don't have any review"})
+
+        let deleteReview=await reviewModel.findOneAndUpdate({$and:[{_id:reviewId},{isDeleted:false}]},{isDeleted:true})
+      
+        let updateBookReview= await bookModel.findOneAndUpdate({_id:bookId},{$inc:{reviews:-1}})
+          //let updateBookReview= await bookModel.findOneAndUpdate({_id:bookId},{reviews:reviews-1})
           res.status(200).send({status:true,message:"Successfully Deleted The Review"})
         }catch(error){
             res.status(500).send({status:false,message:error.message})
         }
       }
-    
-
 module.exports = {createReview, updateReview,  deleteReviewById}

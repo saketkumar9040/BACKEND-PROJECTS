@@ -1,10 +1,11 @@
 const mongoose = require('mongoose')
 
 const isValid = (value) => {
-    if (typeof value === 'undefined' || value === null) return false //it checks whether the value is null or undefined.
-    if (typeof value === 'string' && value.trim().length === 0) return false //it checks whether the string contain only space or not 
-    return true;
-};
+    if (typeof value === "undefined" || value === null) return false
+    if (typeof value === "string" && value.trim().length === 0) return false
+    return true
+
+}
 const isValidTitle = (title) => {
     if (/^[a-zA-Z]+(([',. -][a-zA-Z0-9 ])?[a-zA-Z0-9]*)*$/.test(title))
         return true
@@ -36,11 +37,11 @@ const isValidISBN = (isbn) => {
 
 
 const isValidReview = (review) => {
-    if (/^[0-5]{1}$/.test(isbn))
+    if (/^[0-5]{1}$/.test(review))
         return true
 }
 const isValidDate = (date) => {
-    if (/([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))/)
+    if (/([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))/.test(date))
         return true
 }
 

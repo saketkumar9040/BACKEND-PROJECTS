@@ -4,31 +4,20 @@ const userModel = require("../models/userModel")
 const { isValidObjectId } = require("../validations/validator")
 
 
-const authenticate = async function (req, res, next) {
-    try {
-        let token = req.headers["x-api-key"];
-        if (!token) token = req.headers["X-api-key"];
-        if (!token) return res.status(400).send({ status: false, msg: "token must be present" });
-        console.log(token);
-        let decodedToken = jwt.verify(token, 'DFGHJK34567890--85643ytfhgjkl', function (err, decoded) {
-            if (err) {
-                console.log(err.message)
-            } else return decoded
-        });
-        console.log(decodedToken)
-
-
-        if (!decodedToken) {
-            return res.status(400).send({ status: false, msg: "Invalid authentication token in request" });
+        const authentication= async function(req,res,next){
+            try{
+             let token= req.headers["X-Api-key"];
+             if(!token) token= req.headers["x-api-key"]
+             if (!token) return res.send({ status: false, msg: "token must be present" }); 
+            let decodedToken = jwt.verify(token, 'DFGHJK34567890--85643ytfhgjkl')
+            if(!decodedToken) return res.status(400).send({status:false,msg:"You Enter The InValid Token "})
+            next()
         }
-        req["userId"] = decodedToken.userId;
-        next()
-    }
-    catch (err) {
-        res.status(500).send({ Status: false, mgs: err.message })
-    }
-}
-
+        catch(err){
+            return res.status(500).send({status:false,msg:err.message})
+        }
+        }
+    
 const authorise = async function (req, res, next) {
     try {
 
@@ -79,4 +68,4 @@ const authorise = async function (req, res, next) {
 }
 
 
-module.exports = { authenticate, authorise }
+module.exports = { authentication, authorise }
