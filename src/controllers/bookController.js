@@ -72,35 +72,33 @@ const getAllBooks = async function (req, res) {
 
     try {
 
-        let  data = req.query
-        data.isDeleted = false
-        if("userId" in data){
+        let { category, userId, subcategory } = req.query
+        let obj = {
+            isDeleted: false,
+            isPublished: true
+        }
+        if(userId){
         //if(!Object.keys(data.userId).length)  return res.status(400).send({ status: false, message: `User key should be persent` })
       //  if(!isValid(data.userId)) {return res.status(400).send({ status: false, message: `UserId Value Should Not Be Blank` })}
-        if (!isValidObjectId(data.userId)) return res.status(400).send({ status: false, message: `Invalid userId.` })
-        let checkUser = await userModel.findById(data.userId)
+        if (!isValidObjectId(userId)) return res.status(400).send({ status: false, message: `Invalid userId.` })
+        let checkUser = await userModel.findById(userId)
         if (!checkUser) return res.status(404).send({ status: false, message: "UserId Not Found" })
+        obj.userId = userId.trim()
         }
 
-        if(data.category){
-        if (!isValid(data.category)) return res.status(400).send({ status: false, message: `Category Value Should Not Be Blank` })
-        if (!isValidBody(data.category)) return res.status(400).send({ status: false, message: "category Not Valid" })
+        if (category) {
+            if (category.trim().length == 0) return res.status(400).send({ status: false, msg: "Dont Left Category Query Empty" })
+            obj.category = category.trim()
         }
   
-
-        if(data.subCategory){
-        if (!isValid(data.subCategory)) return res.status(400).send({ status: false, message: `SubCategory Value Should Not Be Blank` })
-        if (!isValidBody(data.subCategory)) return res.status(400).send({ status: false, message: "subcategory Not Valid" })
-        
-        if (data.subCategory) {
-            let subCategory = data.subCategory.split(',').map((x) => (x.trim()))
-            data.subCategory = subCategory
+        if (subcategory) {
+            if (subcategory.trim().length == 0) return res.status(400).send({ status: false, msg: "Dont Left subcategory Query Empty" })
+            obj.subategory =  subcategory.trim().split(",").map(e => e.trim()) 
         }
-       }
-        const bookList = await bookModel.find({id:data}).select({ title: 1, excerpt:1,userId:1,category:1, releasedAt:1, reviews:1}).sort({ title: 1 });
-        if (!bookList.length) return res.status(404).send({ status: false, message: "Book Not Found" })
+        let data = await bookModel.find(obj,{isDeleted:false}).select({ title: 1, excerpt:1,userId:1,category:1, releasedAt:1, reviews:1}).sort({ title: 1 });
+        if (!data.length) return res.status(404).send({ status: false, message: "Book Not Found" })
 
-        res.status(200).send({ status: true, message: "Book List", data: bookList })
+        res.status(200).send({ status: true, message: "Book List", data:data })
 
      } catch (err) {
         res.status(500).send({ status: false, error: err.stack })
