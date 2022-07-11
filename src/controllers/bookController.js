@@ -83,7 +83,7 @@ const getAllBooks = async function (req, res) {
         }
         
         req.query.isDeleted=false
-         //return res.status(400).send({status:false , Msg:"Query should be category userid or subCategory"})
+
         if("userId" in req.query){
             console.log(userId)
         if (!isValidObjectId(userId)) return res.status(400).send({ status: false, message: `Plese enter valid user id.` })
@@ -97,8 +97,7 @@ const getAllBooks = async function (req, res) {
   
         if ("subCategory" in req.query) {
             if (subCategory.trim().length == 0) return res.status(400).send({ status: false, msg: "Dont Left subCategory Query Empty" })
-            subCategory = {$all: subCategory.trim().split(",").map(e => e.trim()) }
-            console.log(subCategory)
+            subCategory =  subCategory.trim().split(",").map(e => e.trim())  
         }
       
         let data = await bookModel.find(req.query).select({ title: 1, excerpt:1,userId:1,category:1, releasedAt:1, reviews:1}).sort({ title: 1 });

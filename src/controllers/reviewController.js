@@ -93,8 +93,19 @@ const updateReview = async function (req, res){
         return res.status(404).send({ status: false, message: "reviewId Not Found" })
         }
 
-        const data = req.body
-        let{reviewedBy,rating,review}=data
+      
+        let data=req.body
+        let{reviewedBy,rating,review}=req.body
+
+        let updateData=Object.keys(req.body)
+        if(updateData.length==0)return res.status(400).send({status:false,msg:"no Data Entered For Updating Review"})
+        if(updateData.length){
+            for(let value of updateData){
+              if (['reviewedBy','rating','review'].indexOf(value)==-1)
+               return res.status(400).send({status:false,msg:`you Cannot Update Using '${value}'`})
+            }
+        }
+
         data.reviewedAt=new Date().toISOString()
         if(Object.keys(data).length===0)return res.status(400).send({ status: false, msg: "To Update Please Enter The Review Details" })
     
@@ -104,7 +115,7 @@ const updateReview = async function (req, res){
         if(!isValid(reviewedBy)) 
         return res.status(400).send({ status: false, msg: `ReviewedBy Value Should Not Be Blank` })
         if(reviewedBy){
-        if (!isValid(reviewedBy)) {
+        if (!isValidBody(reviewedBy)) {
         return res.status(400).send({ status: false, msg: "Reviewer can't be a number" })
         }}
     }
