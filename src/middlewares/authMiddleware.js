@@ -9,9 +9,18 @@ const { isValidObjectId } = require("../validations/validator")
              let token= req.headers["X-Api-key"];
              if(!token) token= req.headers["x-api-key"]
              if (!token) return res.send({ status: false, msg: "token must be present" }); 
-            let decodedToken = jwt.verify(token, 'DFGHJK34567890--85643ytfhgjkl')
-            if(!decodedToken) return res.status(400).send({status:false,msg:"You Enter The InValid Token "})
-            next()
+             jwt.verify(token, "DFGHJK34567890--85643ytfhgjkl",function (err, decoded) {
+                if (err) {
+                     return res.status(401).send({ status: false, msg: "invalid token" })
+                } else {
+                    console.log(decoded)
+                    req.decodedToken=decoded
+                    next()
+                }
+            })
+    
+           // if (!decodedToken) return res.status(401).send({ status: false, msg: "invalid token" })
+            
         }
         catch(err){
             return res.status(500).send({status:false,msg:err.message})
@@ -21,19 +30,20 @@ const { isValidObjectId } = require("../validations/validator")
 const authorise = async function (req, res, next) {
     try {
 
-        let token = req.headers["x-api-key"]
+        // let token = req.headers["x-api-key"]
 
-        if (!token) return res.status(400).send({ status: false, msg: "No Token Found" })
+        // if (!token) return res.status(400).send({ status: false, msg: "No Token Found" })
 
-        let decodedToken = jwt.verify(token, "DFGHJK34567890--85643ytfhgjkl",function (err, decoded) {
-            if (err) {
-                console.log(err.message)
-            } else return decoded
-        })
+        // let decodedToken = jwt.verify(token, "DFGHJK34567890--85643ytfhgjkl",function (err, decoded) {
+        //     if (err) {
+        //         console.log(err.message)
+        //     } else return decoded
+        // })
 
-        if (!decodedToken) return res.status(401).send({ status: false, msg: "invalid token" })
+        // if (!decodedToken) return res.status(401).send({ status: false, msg: "invalid token" })
+        
 
-        let usersId = decodedToken.userId
+        let usersId = req.decodedToken.userId
         let bodyData = req.body.userId
         let booksId = req.params.bookId
 

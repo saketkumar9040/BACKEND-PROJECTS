@@ -73,8 +73,16 @@ const getAllBooks = async function (req, res) {
     try {
 
         let { category, userId, subCategory } = req.query
+       
+        let getFilter = Object.keys(req.query)
+        if(getFilter.length){
+        for(let value of getFilter){
+            if(['category', 'userId', 'subCategory'].indexOf(value)==-1)
+            return res.status(400).send({status: false, message: `You can't filter Using '${value}' `})
+         }
+        }
+        
         req.query.isDeleted=false
-
          //return res.status(400).send({status:false , Msg:"Query should be category userid or subCategory"})
         if("userId" in req.query){
             console.log(userId)
@@ -89,7 +97,7 @@ const getAllBooks = async function (req, res) {
   
         if ("subCategory" in req.query) {
             if (subCategory.trim().length == 0) return res.status(400).send({ status: false, msg: "Dont Left subCategory Query Empty" })
-            subategory = {$all: subCategory.trim().split(",").map(e => e.trim()) }
+            subCategory = {$all: subCategory.trim().split(",").map(e => e.trim()) }
             console.log(subCategory)
         }
       
