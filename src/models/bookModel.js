@@ -30,9 +30,9 @@ const bookSchema = new mongoose.Schema({
         required: 'Category is Required',
         trim: true
     },
-    subcategory: {
+    subCategory: {
         type: [String],
-        required: 'SubCategory is Required',
+        required: 'subCategory is Required',
         trim: true
     },
     reviews: {

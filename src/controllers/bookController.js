@@ -9,7 +9,7 @@ const { isValid, isValidBody, isValidObjectId, isValidTitle, isValidISBN, isVali
 const createBook = async function (req, res) {
     try {
         let data = req.body;
-        let { title, excerpt, userId, ISBN, category, subcategory, releasedAt,reviews} = data;
+        let { title, excerpt, userId, ISBN, category, subCategory, releasedAt,reviews} = data;
 
         if(Object.keys(data).length==0) return res.status(400).send({ Status: false, message: "Please Enter The Valid Book Details" });
         if (!isValid(title))return res.status(400).send({ Status: false, message: "Title Is Required" });
@@ -39,8 +39,8 @@ const createBook = async function (req, res) {
         if (!isValidBody(category))return res.status(400).send({ Status: false, message: "Category Is Invalid" });
         
 
-        if (!isValid(subcategory))return res.status(400).send({ Status: false, message: "Subcategory Is Required" });
-        if (!isValidBody(subcategory))return res.status(400).send({ Status: false, message: "Subcategory Is Invalid" });
+        if (!isValid(subCategory))return res.status(400).send({ Status: false, message: "subCategory Is Required" });
+        if (!isValidBody(subCategory))return res.status(400).send({ Status: false, message: "subCategory Is Invalid" });
         
 
         if(data.reviews){
@@ -72,10 +72,10 @@ const getAllBooks = async function (req, res) {
 
     try {
 
-        let { category, userId, subcategory } = req.query
+        let { category, userId, subCategory } = req.query
         req.query.isDeleted=false
 
-         //return res.status(400).send({status:false , Msg:"Query should be category userid or subcategory"})
+         //return res.status(400).send({status:false , Msg:"Query should be category userid or subCategory"})
         if("userId" in req.query){
             console.log(userId)
         if (!isValidObjectId(userId)) return res.status(400).send({ status: false, message: `Plese enter valid user id.` })
@@ -87,10 +87,10 @@ const getAllBooks = async function (req, res) {
             if (category.trim().length == 0) return res.status(400).send({ status: false, msg: "Dont Left Category Query Empty" })
         }
   
-        if ("subcategory" in req.query) {
-            if (subcategory.trim().length == 0) return res.status(400).send({ status: false, msg: "Dont Left subcategory Query Empty" })
-            subategory = {$all: subcategory.trim().split(",").map(e => e.trim()) }
-            console.log(subcategory)
+        if ("subCategory" in req.query) {
+            if (subCategory.trim().length == 0) return res.status(400).send({ status: false, msg: "Dont Left subCategory Query Empty" })
+            subategory = {$all: subCategory.trim().split(",").map(e => e.trim()) }
+            console.log(subCategory)
         }
       
         let data = await bookModel.find(req.query).select({ title: 1, excerpt:1,userId:1,category:1, releasedAt:1, reviews:1}).sort({ title: 1 });
