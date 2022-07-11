@@ -43,7 +43,7 @@ const createBook = async function (req, res) {
         if (!isValidBody(subCategory))return res.status(400).send({ Status: false, message: "subCategory Is Invalid" });
         
 
-        if(data.reviews){
+        if("reviews"in data){
         if (!isValid(reviews))return res.status(400).send({ Status: false, message: "Reviews Is Required" });
         if (!isValidReview(reviews))return res.status(400).send({ Status: false, message: "Reviews Is Invalid" });
         }

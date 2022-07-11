@@ -18,6 +18,10 @@ const isValidBody = (body) => {
     if (/^[a-zA-Z]+(([',. -][a-zA-Z0-9 ])?[a-zA-Z0-9]*)*$/.test(body))
         return true
 }
+const isValidAddress = (body) => {
+    if (/^[a-zA-Z0-9]+(([',. -][a-zA-Z0-9 ])?[a-zA-Z0-9]*)*$/.test(body))
+        return true
+}
 const isValidPassword = (pw) => {
     if (/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[#$^+=!*()@%&]).{8,15}$/.test(pw))
         return true
@@ -46,4 +50,4 @@ const isValidDate = (date) => {
 }
 
 
-module.exports = { isValid, isValidBody, isValidObjectId, isValidTitle, isValidPassword, isValidName, isValidEmail, isValidISBN, isValidReview, isValidDate }
+module.exports = { isValid, isValidBody, isValidObjectId, isValidTitle, isValidPassword, isValidName, isValidEmail, isValidISBN, isValidReview, isValidDate,isValidAddress }

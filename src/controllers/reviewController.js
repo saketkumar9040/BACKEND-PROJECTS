@@ -72,29 +72,6 @@ const updateReview = async function (req, res){
     try{
     
         const book_id = req.params.bookId;
-        const review_Id = req.params.reviewId
-        const data = req.body
-    
-        if(!isValid(data)) return res.status(400).send({ status: false, msg: "To Update Please Enter The Review Details" })
-
-        if(!isValid(data.reviewedBy)) 
-        return res.status(400).send({ status: false, msg: `ReviewedBy Value Should Not Be Blank` })
-        if(data.reviewedBy){
-        if (!isValidBody(data.reviewedBy)) {
-        return res.status(400).send({ status: false, msg: "Reviewer can't be a number" })
-        }}
-    
-        if(!isValid(data.rating)) return res.status(400).send({ status: false, msg: `Ratting Value Should Not Be Blank`})
-        if(data.rating){
-        if (!(data.rating >= 1 && data.rating <= 5)) {
-        return res.status(400).send({ status: false, message: "Rating must be in between 1 to 5." })
-        }}
-
-
-        if(!isValid(data.review)) return res.status(400).send({ status: false, msg: `Review Value Should Not Be Blank`})
-        if(!isValidBody(data.review)){
-        return res.status(400).send({ status: false, message: "Review must be present" })
-        }
 
         if(!isValid(book_id)) return res.status(400).send({ status: false, msg: `BookId Value Should Not Be Blank`})
         if (!isValidObjectId(book_id)) {
@@ -105,6 +82,8 @@ const updateReview = async function (req, res){
             return res.status(404).send({ status: false, message: "BookId Not Found" })
             }
 
+        const review_Id = req.params.reviewId
+
         if(!isValid(review_Id)) return res.status(400).send({ status: false, msg: `ReviewId Value Should Not Be Blank`})
         if (!isValidObjectId(review_Id)) {
         return res.status(400).send({ status: false, message: "Invalid reviewId." })
@@ -113,20 +92,51 @@ const updateReview = async function (req, res){
         if(!checkReview){
         return res.status(404).send({ status: false, message: "reviewId Not Found" })
         }
+
+        const data = req.body
+        let{reviewedBy,rating,review}=data
+        data.reviewedAt=new Date().toISOString()
+        if(Object.keys(data).length===0)return res.status(400).send({ status: false, msg: "To Update Please Enter The Review Details" })
+    
+        //if(!isValid(data)) return res.status(400).send({ status: false, msg: "To Update Please Enter The Review Details" })
+
+        if("reviewedBy" in data){
+        if(!isValid(reviewedBy)) 
+        return res.status(400).send({ status: false, msg: `ReviewedBy Value Should Not Be Blank` })
+        if(reviewedBy){
+        if (!isValid(reviewedBy)) {
+        return res.status(400).send({ status: false, msg: "Reviewer can't be a number" })
+        }}
+    }
+        if("rating" in data){
+        if(!isValid(rating)) return res.status(400).send({ status: false, msg: `Ratting Value Should Not Be Blank`})
+        if(rating){
+        if (!(rating >= 1 && data.rating <= 5)) {
+        return res.status(400).send({ status: false, message: "Rating must be in between 1 to 5." })
+        }}
+    }
+
+        if("review" in data){
+        if(!isValid(review)) return res.status(400).send({ status: false, msg: `Review Value Should Not Be Blank`})
+        if(!isValidBody(review)){
+        return res.status(400).send({ status: false, message: "Review must be present" })
+        }
+    }
+
     
         if (checkBook.isDeleted == true||checkReview.isDeleted==true){
         return res.status(400).send({ status: false, message: "Can't update review of a Deleted Book " })
         }
-        const updateReviewData = await reviewModel.findOneAndUpdate({ _id: review_Id }, { review: data.review, rating: data.rating, reviewedBy: data.reviewedBy },{ new: true })
-        let result=checkBook
-        result.reviewsData=updateReviewData
+        const updateReviewData = await reviewModel.findOneAndUpdate({ _id: review_Id }, data,{ new: true }).select({ isDeleted:0 , createdAt: 0, __v: 0, updatedAt: 0 })
+        let { _id, title, excerpt, userId ,category, subcategory, isDeleted, reviews, releasedAt, createdAt, updatedAt} = checkBook
+        let reviewsData = [updateReviewData]
+        let result = { _id, title, excerpt, userId ,category, subcategory, isDeleted, reviews, releasedAt, createdAt, updatedAt , reviewsData}
         res.status(200).send({ status: true, message: "Successfully updated the review of the book.", data: result })
     
     }catch(err){
         res.status(500).send({ status: false, Error: err.message })
     }
     }
-
 
 
 

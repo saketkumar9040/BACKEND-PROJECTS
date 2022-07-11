@@ -9,7 +9,7 @@ const {createBook, getAllBooks, getBookById, updateBook, deleteBookById } = requ
 router.post("/register", createUser)
 router.post("/login", loginUser)
 
-router.post("/books",createBook)
+router.post("/books",authentication,authorise,createBook)
 router.get("/books", authentication, getAllBooks)
 router.get("/books/:bookId", authentication, getBookById)
 router.put("/books/:bookId", authentication,authorise, updateBook)

@@ -1,6 +1,6 @@
 const userModel = require("../models/userModel");
 const jwt = require('jsonwebtoken')
-const { isValid, isValidBody, isValidPassword, isValidName, isValidEmail, address } = require("../validations/validator")
+const { isValid, isValidBody, isValidPassword, isValidName, isValidEmail, isValidAddress } = require("../validations/validator")
 
 /**************************************************Create User API**************************************************/
 const createUser = async function (req, res) {
@@ -33,7 +33,7 @@ const createUser = async function (req, res) {
         if (checkEmail) return res.status(400).send({ status: false, message: `Email Address is Already Registered` })
 
         if (!isValid(password)) return res.status(400).send({ status: false, message: 'Password is Required' })
-        if (!isValidPassword(password)) { return res.status(400).send({ status: false, message: "Password must contains 1 upperCaseletter 1 smallCaseLetter 1 special character and 1 digit range 8 to 15" }) }
+        if (!isValidPassword(password)) { return res.status(400).send({ status: false, message: "Password must contains 1 upperCaseletter 1 lowerCaseLetter 1 special character and  Total Character should  be 8 to 15" }) }
 
         if (!isValidBody(data.address.street))return res.status(400).send({ status: false, message: 'Address Of street is Invalid' })
         if(!isValid(data.address.street)) return res.status(400).send({status:false,message:"Do not leave blank address"})
@@ -70,7 +70,7 @@ const loginUser = async function (req, res) {
 
         if (!isValid(password)) return res.status(400).send({ status: false, message: 'Password is Required' })
         if (!isValidPassword(password)) {
-            return res.status(400).send({ status: false, message: "Password should have length in range 8 to 15" })
+            return res.status(400).send({ status: false, message: "Password must contains 1 upperCaseletter 1 lowerCaseLetter 1 special character and  Total Character should  be 8 to 15" })
         }
         const user = await userModel.findOne({ email: email, password: password })
         if (!user) return res.status(401).send({ status: false, message: 'Invalid Login Credentials' });
