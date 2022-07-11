@@ -33,12 +33,14 @@ const createUser = async function (req, res) {
         if (checkEmail) return res.status(400).send({ status: false, message: `Email Address is Already Registered` })
 
         if (!isValid(password)) return res.status(400).send({ status: false, message: 'Password is Required' })
-        if (!isValidPassword(password)) { return res.status(400).send({ status: false, message: "Password should have length in range 8 to 15" }) }
+        if (!isValidPassword(password)) { return res.status(400).send({ status: false, message: "Password must contains 1 upperCaseletter 1 smallCaseLetter 1 special character and 1 digit range 8 to 15" }) }
 
-        if (!isValidBody(data.address.street))
-            return res.status(400).send({ status: false, message: 'Address Of street is Invalid' })
-        if (!isValidBody(data.address.city))
-            return res.status(400).send({ status: false, message: 'Address Of city is Invalid' })
+        if (!isValidBody(data.address.street))return res.status(400).send({ status: false, message: 'Address Of street is Invalid' })
+        if(!isValid(data.address.street)) return res.status(400).send({status:false,message:"Do not leave blank address"})
+        if (!isValidBody(data.address.city))return res.status(400).send({ status: false, message: 'Address Of city is Invalid' })
+        if(!isValid(data.address.city)) return res.status(400).send({status:false,message:"Do not leave blank C.. address"})
+      
+      
         if (!(/^[1-9]{1}[0-9]{5}$/).test(data.address.pincode))
             return res.status(400).send({ status: false, message: 'Address Of pincode is Invalid' })
 
@@ -74,7 +76,7 @@ const loginUser = async function (req, res) {
         if (!user) return res.status(401).send({ status: false, message: 'Invalid Login Credentials' });
 
 
-        const token = await jwt.sign({
+        const token = jwt.sign({
             userId: user._id,
             iat: Math.floor(Date.now() / 1000),
             exp: Math.floor(Date.now() / 1000) * 24 * 60 * 60,

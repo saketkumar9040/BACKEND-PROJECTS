@@ -73,35 +73,33 @@ const getAllBooks = async function (req, res) {
     try {
 
         let { category, userId, subcategory } = req.query
-        let obj = {
-            isDeleted: false,
-            isPublished: true
-        }
-        if(userId){
-        //if(!Object.keys(data.userId).length)  return res.status(400).send({ status: false, message: `User key should be persent` })
-      //  if(!isValid(data.userId)) {return res.status(400).send({ status: false, message: `UserId Value Should Not Be Blank` })}
-        if (!isValidObjectId(userId)) return res.status(400).send({ status: false, message: `Invalid userId.` })
+        req.query.isDeleted=false
+
+         //return res.status(400).send({status:false , Msg:"Query should be category userid or subcategory"})
+        if("userId" in req.query){
+            console.log(userId)
+        if (!isValidObjectId(userId)) return res.status(400).send({ status: false, message: `Plese enter valid user id.` })
         let checkUser = await userModel.findById(userId)
         if (!checkUser) return res.status(404).send({ status: false, message: "UserId Not Found" })
-        obj.userId = userId.trim()
         }
 
-        if (category) {
+        if ("category" in req.query) {
             if (category.trim().length == 0) return res.status(400).send({ status: false, msg: "Dont Left Category Query Empty" })
-            obj.category = category.trim()
         }
   
-        if (subcategory) {
+        if ("subcategory" in req.query) {
             if (subcategory.trim().length == 0) return res.status(400).send({ status: false, msg: "Dont Left subcategory Query Empty" })
-            obj.subategory =  subcategory.trim().split(",").map(e => e.trim()) 
+            subategory = {$all: subcategory.trim().split(",").map(e => e.trim()) }
+            console.log(subcategory)
         }
-        let data = await bookModel.find(obj,{isDeleted:false}).select({ title: 1, excerpt:1,userId:1,category:1, releasedAt:1, reviews:1}).sort({ title: 1 });
+      
+        let data = await bookModel.find(req.query).select({ title: 1, excerpt:1,userId:1,category:1, releasedAt:1, reviews:1}).sort({ title: 1 });
         if (!data.length) return res.status(404).send({ status: false, message: "Book Not Found" })
 
-        res.status(200).send({ status: true, message: "Book List", data:data })
-
-     } catch (err) {
-        res.status(500).send({ status: false, error: err.stack })
+        return res.status(200).send({ status: true, message: "Book List", data:data })
+    
+      } catch (err) {
+        res.status(500).send({ status: false, error: err.message })
      }
      }
 
@@ -117,12 +115,9 @@ const getBookById = async function (req, res) {
         if (!isValidObjectId(bookId)) return res.status(400).send({ status: false, message: "Invalid userId." })
 
         let checkBook = await bookModel.findOne({ _id: bookId, isDeleted: false })
-
         if (!checkBook) return res.status(404).send({ status: false, message: "BookId Not Found" })
 
-        const getReviewsData = await reviewModel.find({ bookId: checkBook._id, isDeleted: false })
-           .select({ deletedAt: 0, isDeleted: 0, createdAt: 0, __v: 0, updatedAt: 0 })
-
+        const getReviewsData = await reviewModel.find({ bookId: checkBook._id, isDeleted: false }).select({ deletedAt: 0, isDeleted:0 , createdAt: 0, __v: 0, updatedAt: 0 })
         checkBook.reviewsData = getReviewsData
 
         res.status(200).send({ status: true, message: "Book List", data: checkBook })
