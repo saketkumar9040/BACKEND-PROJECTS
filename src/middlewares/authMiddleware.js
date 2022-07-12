@@ -8,40 +8,25 @@ const { isValidObjectId } = require("../validations/validator")
             try{
              let token= req.headers["X-Api-key"];
              if(!token) token= req.headers["x-api-key"]
-             if (!token) return res.send({ status: false, msg: "token must be present" }); 
+             if (!token) return res.send({ status: false, message: "token must be present" }); 
              jwt.verify(token, "DFGHJK34567890--85643ytfhgjkl",function (err, decoded) {
                 if (err) {
-                     return res.status(401).send({ status: false, msg: "invalid token" })
+                     return res.status(401).send({ status: false, message: "invalid token" })
                 } else {
                     console.log(decoded)
                     req.decodedToken=decoded
                     next()
                 }
             })
-    
-           // if (!decodedToken) return res.status(401).send({ status: false, msg: "invalid token" })
             
         }
         catch(err){
-            return res.status(500).send({status:false,msg:err.message})
+            return res.status(500).send({status:false,message:err.message})
         }
         }
     
 const authorise = async function (req, res, next) {
     try {
-
-        // let token = req.headers["x-api-key"]
-
-        // if (!token) return res.status(400).send({ status: false, msg: "No Token Found" })
-
-        // let decodedToken = jwt.verify(token, "DFGHJK34567890--85643ytfhgjkl",function (err, decoded) {
-        //     if (err) {
-        //         console.log(err.message)
-        //     } else return decoded
-        // })
-
-        // if (!decodedToken) return res.status(401).send({ status: false, msg: "invalid token" })
-        
 
         let usersId = req.decodedToken.userId
         let bodyData = req.body.userId
@@ -57,8 +42,6 @@ const authorise = async function (req, res, next) {
             }
         }
 
-
-
         if (booksId) {
             if (!isValidObjectId(booksId)) return res.status(400).send({ status: false, message: "The BookId is Invalid." })
             let checkBookData = await bookModel.findOne({ _id: booksId, isDeleted: false })
@@ -73,7 +56,7 @@ const authorise = async function (req, res, next) {
         next()
 
     } catch (err) {
-        res.status(500).send({ status: false, Error: err.message })
+        res.status(500).send({ status: false, message: err.message })
     }
 }
 

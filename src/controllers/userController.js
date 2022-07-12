@@ -1,6 +1,6 @@
 const userModel = require("../models/userModel");
 const jwt = require('jsonwebtoken')
-const { isValid, isValidBody, isValidPassword, isValidName, isValidEmail, isValidAddress } = require("../validations/validator")
+const { isValid, isValidBody, isValidPassword, isValidName, isValidEmail} = require("../validations/validator")
 
 /**************************************************Create User API**************************************************/
 const createUser = async function (req, res) {
@@ -15,15 +15,15 @@ const createUser = async function (req, res) {
         if (!isValid(title))
             return res.status(400).send({ status: false, message: 'Title Is Required' })
 
-        if (["Mr", "Mrs", "Miss"].indexOf(title) == -1) { return res.status(400).send({ status: false, data: "Enter a valid Title (e.g- Mr or Mrs or Miss)", }); }
+        if (["Mr", "Mrs", "Miss"].indexOf(title) == -1) { return res.status(400).send({ status: false, message: "Enter a valid Title (e.g- Mr or Mrs or Miss)", }); }
 
         if (!isValid(name)) return res.status(400).send({ status: false, message: 'Name Is Required' })
-        if (!isValidName(name)) return res.status(400).send({ status: false, msg: "Please Enter A Valid User Name" })
+        if (!isValidName(name)) return res.status(400).send({ status: false, message: "Please Enter A Valid User Name" })
 
         if (!isValid(phone)) return res.status(400).send({ status: false, message: 'Phone Is Required' })
-        if (!(/^(\+\d{1,3}[- ]?)?\d{10}$/).test(phone)) { return res.status(400).send({ status: false, msg: `${phone} is Not a Valid Mobile Number ` }) }
+        if (!(/^(\+\d{1,3}[- ]?)?\d{10}$/).test(phone)) { return res.status(400).send({ status: false, message: `${phone} is Not a Valid Mobile Number ` }) }
+        
         const checkPhone = await userModel.findOne({ phone: phone });
-
         if (checkPhone) return res.status(400).send({ status: false, message: `Phone Is Already Registered` })
 
         if (!isValid(email)) return res.status(400).send({ status: false, message: 'Email Is Required' })
@@ -38,17 +38,16 @@ const createUser = async function (req, res) {
         if (!isValidBody(data.address.street))return res.status(400).send({ status: false, message: 'Address Of street is Invalid' })
         if(!isValid(data.address.street)) return res.status(400).send({status:false,message:"Do not leave blank address"})
         if (!isValidBody(data.address.city))return res.status(400).send({ status: false, message: 'Address Of city is Invalid' })
-        if(!isValid(data.address.city)) return res.status(400).send({status:false,message:"Do not leave blank C.. address"})
+        if(!isValid(data.address.city)) return res.status(400).send({status:false,message:"Do not leave blank City address"})
       
       
         if (!(/^[1-9]{1}[0-9]{5}$/).test(data.address.pincode))
             return res.status(400).send({ status: false, message: 'Address Of pincode is Invalid' })
 
         const newUser = await userModel.create(data);
-        res.status(201).send({ status: true, message: 'User created successfully!!!', data: newUser });
+        res.status(201).send({ status: true, message: 'Success', data: newUser });
 
     } catch (err) {
-
         res.status(500).send({ status: false, message: err.message })
     }
 }
@@ -83,10 +82,10 @@ const loginUser = async function (req, res) {
 
         res.setHeader('x-api-key',token)
 
-        res.status(200).send({ status: true, message: "Login Sucsessful", data: token });
+        res.status(200).send({ status: true, message: "Success", data: token });
 
     } catch (err) {
-        res.status(500).send({ status: false, msg: err.message })
+        res.status(500).send({ status: false, message: err.message })
     }
 }
 
