@@ -59,9 +59,8 @@ const loginUser = async function (req, res) {
     try {
 
         let data = req.body
+        if(Object.keys(data).length===0)return res.status(400).send({ status: false, message: "Please Provide Login Details" })
         const { password, email } = data
-
-        if (!isValid(data)) return res.status(400).send({ status: false, message: "Please Provide Login Details" })
 
         if (!isValid(email)) return res.status(400).send({ status: false, message: 'Email is Required' })
         if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
@@ -81,6 +80,8 @@ const loginUser = async function (req, res) {
             iat: Math.floor(Date.now() / 1000),
             exp: Math.floor(Date.now() / 1000) * 24 * 60 * 60,
         }, 'DFGHJK34567890--85643ytfhgjkl')
+
+        res.setHeader('x-api-key',token)
 
         res.status(200).send({ status: true, message: "Login Sucsessful", data: token });
 

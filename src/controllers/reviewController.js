@@ -24,7 +24,7 @@ const createReview = async function(req,res){
 
         // ReviewedBy Validation
         if(!reviewedBy) 
-        return res.status(400).send({status : false, message : 'Please enter reviewedBy Key'})
+        reviewedBy = 'Guest'
         if(!isValid(reviewedBy)) 
         return res.status(400).send({status : false, message : ' reviewedBy Field Is Empty'})
 
@@ -61,7 +61,11 @@ const createReview = async function(req,res){
         //-----------------[Review Document Creation]-----------------
 
         const reviewData = await reviewModel.create({bookId : bookId, ...data})
-        res.status(201).send({status : true, message : 'Success', data :{_id:reviewData._id,bookId:reviewData.bookId,reviewedBy:reviewData.reviewedBy,reviewedAt:reviewData.reviewedAt,rating:reviewData.rating,review:reviewData.review}})
+
+        let { _id, title, excerpt, userId ,category, subcategory, isDeleted, reviews, releasedAt, createdAt, updatedAt} = checkBookId
+        let reviewsData = {_id: reviewData._id, bookId: reviewData.bookId, reviewedBy: reviewData.reviewedBy, reviewedAt: reviewData.reviewedAt, rating: reviewData.rating, review: reviewData.review}
+        let result = { _id, title, excerpt, userId ,category, subcategory, isDeleted, reviews, releasedAt, createdAt, updatedAt , reviewsData}
+        res.status(201).send({status : true, message : 'Success', data :result})
     }
     catch(err){
         res.status(500).send({status : false, message : err.message})
