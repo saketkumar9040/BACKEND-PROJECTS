@@ -34,15 +34,22 @@ const createUser = async function (req, res) {
 
         if (!isValid(password)) return res.status(400).send({ status: false, message: 'Password is Required' })
         if (!isValidPassword(password)) { return res.status(400).send({ status: false, message: "Password must contains 1 upperCaseletter 1 lowerCaseLetter 1 special character and  Total Character should  be 8 to 15" }) }
-
-        if (!isValidBody(data.address.street))return res.status(400).send({ status: false, message: 'Address Of street is Invalid' })
-        if(!isValid(data.address.street)) return res.status(400).send({status:false,message:"Do not leave blank address"})
-        if (!isValidBody(data.address.city))return res.status(400).send({ status: false, message: 'Address Of city is Invalid' })
-        if(!isValid(data.address.city)) return res.status(400).send({status:false,message:"Do not leave blank City address"})
-      
-      
-        if (!(/^[1-9]{1}[0-9]{5}$/).test(data.address.pincode))
-            return res.status(400).send({ status: false, message: 'Address Of pincode is Invalid' })
+        
+        if(data.address){
+            if(data.address.street){
+            if(!isValid(data.address.street)) return res.status(400).send({status:false,message:"Do not leave blank address"})
+            }
+            if(data.address.city){
+            if (!isValidBody(data.address.city))return res.status(400).send({ status: false, message: 'Address Of city is Invalid' })
+            if(!isValid(data.address.city)) return res.status(400).send({status:false,message:"Do not leave blank City address"})
+            
+        }
+          
+            if(data.address.pincode){
+            if (!(/^[1-9]{1}[0-9]{5}$/).test(data.address.pincode))
+                return res.status(400).send({ status: false, message: 'Address Of pincode is Invalid' })
+            }
+    }
 
         const newUser = await userModel.create(data);
         res.status(201).send({ status: true, message: 'Success', data: newUser });

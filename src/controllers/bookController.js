@@ -22,8 +22,6 @@ const createBook = async function (req, res) {
 
         
         if (!isValid(excerpt))return res.status(400).send({ Status: false, message: "Excerpt Is Required" });
-        if (!isValidBody(excerpt))return res.status(400).send({ Status: false, message: "Excerpt Is Invalid" });
-      
        
         if (!isValid(userId))return res.status(400).send({ Status: false, message: "UserId Is Required" });
         if (!isValidObjectId(userId))return res.status(400).send({ Status: false, message: "UserId Is Invalid"});
@@ -33,7 +31,7 @@ const createBook = async function (req, res) {
         
         
         if (!isValid(ISBN))return res.status(400).send({ Status: false, message: "ISBN Is Required" });
-        if (!isValidISBN(ISBN)) return res.status(400).send({ Status: false, message: "ISBN Is Invalid" });
+        if (!isValidISBN(ISBN)) return res.status(400).send({ Status: false, message: "ISBN should have 13 digits" });
 
         let findOneISBN = await bookModel.findOne({ ISBN: ISBN });
         if (findOneISBN)return res.status(400).send({ Status: false, message: "ISBN Is Already Exists" });
@@ -45,11 +43,10 @@ const createBook = async function (req, res) {
 
         if (!isValid(subCategory))return res.status(400).send({ Status: false, message: "subCategory Is Required" });
         if (!isValidBody(subCategory))return res.status(400).send({ Status: false, message: "subCategory Is Invalid" });
-        
+        subCategory=subCategory.trim()
             
         if("reviews"in data){
         if (!isValid(reviews))return res.status(400).send({ Status: false, message: "Reviews Is Required" });
-        if (!isValidReview(reviews))return res.status(400).send({ Status: false, message: "Reviews Is Invalid" });
         }
 
         if (!isValid(releasedAt)) return res.status(400).send({ Status: false, message: "ReleasedAt Is Required" });
