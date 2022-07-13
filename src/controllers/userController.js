@@ -81,7 +81,7 @@ const loginUser = async function (req, res) {
         if (!user) return res.status(401).send({ status: false, message: 'Invalid Login Credentials' });
 
 
-        const token = jwt.sign({userId: user._id, }, 'DFGHJK34567890--85643ytfhgjkl',{expiresIn:"30s"})
+        const token = jwt.sign({userId: user._id, }, 'DFGHJK34567890--85643ytfhgjkl',{expiresIn:"1d"})
 
         res.setHeader('x-api-key',token)
 
