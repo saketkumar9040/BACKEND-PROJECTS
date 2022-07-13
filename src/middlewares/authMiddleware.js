@@ -11,7 +11,7 @@ const { isValidObjectId } = require("../validations/validator")
              if (!token) return res.send({ status: false, message: "token must be present" }); 
              jwt.verify(token, "DFGHJK34567890--85643ytfhgjkl",function (err, decoded) {
                 if (err) {
-                     return res.status(401).send({ status: false, message: "invalid token" })
+                     return res.status(401).send({ status: false, message: err.message })
                 } else {
                     console.log(decoded)
                     req.decodedToken=decoded

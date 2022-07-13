@@ -67,7 +67,7 @@ const createReview = async function(req,res){
         let { _id, title, excerpt, userId ,category, subcategory, isDeleted, reviews, releasedAt, createdAt, updatedAt} = checkBookId
         let reviewsData = {_id: reviewData._id, bookId: reviewData.bookId, reviewedBy: reviewData.reviewedBy, reviewedAt: reviewData.reviewedAt, rating: reviewData.rating, review: reviewData.review}
         let result = { _id, title, excerpt, userId ,category, subcategory, isDeleted, reviews, releasedAt, createdAt, updatedAt , reviewsData}
-       return res.status(201).send({status : true, message : 'Sucess', data :result})
+       return res.status(201).send({status : true, message : 'Success', data :result})
     }
     catch(err){
        return res.status(500).send({status : false, message : err.message})
@@ -145,7 +145,7 @@ const updateReview = async function (req, res){
         let { _id, title, excerpt, userId ,category, subcategory, isDeleted, reviews, releasedAt, createdAt, updatedAt} = checkBook
         let reviewsData = [updateReviewData]
         let result = { _id, title, excerpt, userId ,category, subcategory, isDeleted, reviews, releasedAt, createdAt, updatedAt , reviewsData}
-        return  res.status(200).send({ status: true, message: "Sucess", data: result })
+        return  res.status(200).send({ status: true, message: "success", data: result })
     
     }catch(err){
        return res.status(500).send({ status: false, message: err.message })
@@ -179,7 +179,7 @@ const updateReview = async function (req, res){
       
         await bookModel.findOneAndUpdate({_id:bookId},{$inc:{reviews:-1}})
 
-         return res.status(200).send({status:true,message:"Sucessfully Deleted The Review"})
+         return res.status(200).send({status:true,message:"successfully Deleted The Review"})
         }catch(err){
             res.status(500).send({status:false,message:err.message})
         }
