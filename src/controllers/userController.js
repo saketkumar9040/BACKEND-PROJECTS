@@ -556,7 +556,7 @@ const updateUser = async function (req, res) {
     }
     user.save();
     return res
-      .status(201)
+      .status(200)
       .send({ status: true, message: "updated Successfully", data: user });
   } catch (error) {
     console.log(error);
