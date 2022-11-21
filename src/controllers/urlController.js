@@ -2,7 +2,6 @@
 ////////////////////////////////     MODULES   AND   PACKAGES  IMPORTED     ///////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-const validUrl = require("valid-url");                      // USING IT FOR VALIDATING URL RECEIVED IN REQUEST BODY
 const shortId = require("shortid");                         // USING IT FOR CREATING SHORT ID
 const urlModel = require("../models/urlModel");             // REQUIRED THIS MODEL FOR DB-CALLS
 const redis = require("redis");                             // USING REDIS PACKAGE FOR CACHING
@@ -13,11 +12,11 @@ const { promisify } = require("util");                      // USING UTIL PACKAG
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 const redisClient = redis.createClient(
-    10398,// PORT
-    "redis-10398.c212.ap-south-1-1.ec2.cloud.redislabs.com",                   // CLIENT END-POINT
+    16801,// PORT
+    "redis-16801.c264.ap-south-1-1.ec2.cloud.redislabs.com",                 // CLIENT END-POINT
     { no_ready_check: true }
 );
-redisClient.auth("hvbyvcPuFpChZ3M8cozmFILuUwv4ZMWG", function (err) {        // AUTHENTICATING USER VIA PASSWORD
+redisClient.auth("7b2wsqk4F7AXR5YEnogkIGfCSZgBjPkd", function (err) {        // AUTHENTICATING USER VIA PASSWORD
     if (err) throw err;
 });
 
@@ -32,25 +31,26 @@ const GET_ASYNC = promisify(redisClient.GET).bind(redisClient);        // DEFINI
 /////////////////////////////////       CREATE    URL     API      //////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-const urlRegex = (value) => {                                  //  USING THIS REGEX TO VALIDATE URL PATTERN
-    let urlRegex = /^(?:(?:(?:https?|http):)?\/\/.*\.(?:png|gif|webp|com|in|org|co|co.in|net|jpeg|jpg))/i;
-    if (urlRegex.test(value))
-        return true;
-}
-
 const createUrl = async (req, res) => {
     try {
         let data = req.body
 
         if (Object.keys(data).length === 0) return res.status(400).send({ status: false, message: "Body is empty!" })
 
+        const urlRegex = (value) => {                     //  USING THIS REGEX TO VALIDATE URL PATTERN
+            let urlRegex = /^(?:(?:(?:https?|http):)?\/\/.*\.(?:png|gif|webp|com|in|org|co|co.in|net|jpeg|jpg))/i;
+            if (urlRegex.test(value))
+                return true;
+        }
+
         if (!urlRegex(data.longUrl)) return res.status(400).send({ status: false, message: "Either the url key or the url entered is incorrect!" })
 
-        let cache = await GET_ASYNC(`${data.longUrl}`)                       // SEARCHING FOR URL IN CLOUD STORAGE
+        let cache = await GET_ASYNC(`${data.longUrl}`)                     // SEARCHING FOR URL IN CLOUD STORAGE
         cache = JSON.parse(cache)
+    
         if (cache) { return res.status(200).send({ status: true, cacheData: cache }) }
 
-        let uniqueUrl = await urlModel.findOne({ longUrl: data.longUrl }).select({ __v: 0, createdAt: 0, updatedAt: 0, _id: 0 })
+        let uniqueUrl = await urlModel.findOne({ longUrl:data.longUrl }).select({ __v: 0, createdAt: 0, updatedAt: 0, _id: 0 })
         if (uniqueUrl) return res.status(200).send({ status: true, data: uniqueUrl })// SEARCHING FOR URL IN DB
 
         let urlCode = shortId.generate().toLocaleLowerCase();               //  GENERATING SHORT-ID OF ORIGINAL URL
@@ -85,7 +85,7 @@ const getUrl = async (req, res) => {
         const findUrl = await urlModel.findOne({ urlCode })
         //  SEARCHING FOR URL-CODE  IN  DATABASE IF NOT PRESENT IN CLOUD STORAGE
 
-        if (!findUrl) return res.status(400).send({ status: false, message: "Url not found!" })
+        if (!findUrl) return res.status(404).send({ status: false, message: "Url not found!" })
 
         await SET_ASYNC(`${urlCode}`, JSON.stringify(findUrl))           // STORING THE DATA IN CLOUD FOR FURTHER USE
 
