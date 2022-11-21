@@ -35,7 +35,7 @@ const authorise = async function (req, res, next) {
         if (bodyData) {
             if (!isValidObjectId(bodyData)) return res.status(400).send({ status: false, message: "The userId is Invalid" })
             let checkUser = await userModel.findById(bodyData)
-            if (!checkUser) return res.status(400).send({ status: false, message: "UserId Not Found" })
+            if (!checkUser) return res.status(404).send({ status: false, message: "UserId Not Found" })
             if (usersId != bodyData) {
                 return res.status(403).send
                     ({ status: false, message: "UnAuthorized Access!!" })
@@ -45,7 +45,7 @@ const authorise = async function (req, res, next) {
         if (booksId) {
             if (!isValidObjectId(booksId)) return res.status(400).send({ status: false, message: "The BookId is Invalid." })
             let checkBookData = await bookModel.findOne({ _id: booksId, isDeleted: false })
-            if (!checkBookData) return res.status(400).send({ status: false, message: "BookId Not Found" })
+            if (!checkBookData) return res.status(404).send({ status: false, message: "BookId Not Found" })
             let checkBook = await bookModel.findOne({ _id: booksId, userId: usersId })
             if (!checkBook) {
                 return res.status(403).send
